@@ -5,6 +5,7 @@ import (
 	"OfflineSearchEngine/internals/SearchEngines/LinearFastSearchEngine"
 	"OfflineSearchEngine/internals/SearchEngines/LinearSortedEngine"
 	"OfflineSearchEngine/internals/SearchEngines/LinearSortedEngineWithPosting"
+	"OfflineSearchEngine/internals/SearchEngines/invertedIndex"
 	"OfflineSearchEngine/internals/SearchEngines/models"
 	"bufio"
 )
@@ -24,7 +25,9 @@ func NewSearchEngine(str string, cap int) SearchEngine {
 		return LinearSortedEngine.CreateLinearSortedEngine(cap)
 	case "v4":
 		return LinearSortedEngineWithPosting.CreateLinearSortedEngineWithPosting(cap)
+	case "v5":
+		return invertedIndex.CreateInvertedIndex(cap)
 	default:
-		return nil
+		return LinearFastAddEngin.CreateLinearFastAddEngin(cap)
 	}
 }
