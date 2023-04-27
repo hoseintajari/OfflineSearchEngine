@@ -26,8 +26,10 @@ type (
 	EngineV2 struct {
 		Data []TermInfoWithFreq
 	}
-
 	EngineV4 struct {
 		Data []PostingList
+	}
+	InvertedIndex struct {
+		Data map[string][]SearchResult
 	}
 )
