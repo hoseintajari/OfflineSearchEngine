@@ -47,11 +47,11 @@ func find(id int, s []models.SearchResult) bool {
 }
 
 func GetFreq(s string, stringSLice []string) int {
-	Frecuency := 0
+	frequency := 0
 	for _, v := range stringSLice {
 		if s == v {
-			Frecuency++
+			frequency++
 		}
 	}
-	return Frecuency
+	return frequency
 }
