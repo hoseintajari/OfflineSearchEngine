@@ -44,7 +44,7 @@ func stopWordsRemover(s []string) []string {
 		"the": true,
 		"is":  true,
 		"and": true,
-		"":    true,
+		"to":  true,
 	}
 	for _, v := range s {
 		if !stopWords[v] {
