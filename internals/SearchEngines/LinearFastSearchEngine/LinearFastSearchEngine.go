@@ -3,7 +3,6 @@ package LinearFastSearchEngine
 import (
 	"OfflineSearchEngine/internals/SearchEngines/models"
 	"OfflineSearchEngine/internals/linguisticModule"
-	"bufio"
 	"strings"
 )
 
@@ -13,8 +12,8 @@ func CreateLinearFastSearchEngine(capacity int) *EngineV2 {
 	return &EngineV2{Data: make([]models.TermInfoWithFreq, 0, capacity)}
 }
 
-func (e *EngineV2) AddDoc(s *bufio.Scanner, id int) {
-	stringSlice := linguisticModule.Scanner(s)
+func (e *EngineV2) AddDoc(s []string, id int, module linguisticModule.LinguisticModule) {
+	stringSlice := module.Convert(s)
 	for _, v := range stringSlice {
 		e.Data = append(e.Data, models.TermInfoWithFreq{Term: v, DocId: id, Freq: GetFreq(v, stringSlice)})
 	}

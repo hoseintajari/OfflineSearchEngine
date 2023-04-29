@@ -2,8 +2,7 @@ package LinearSortedEngineWithPosting
 
 import (
 	"OfflineSearchEngine/internals/SearchEngines/models"
-	linguisticModule2 "OfflineSearchEngine/internals/linguisticModule"
-	"bufio"
+	"OfflineSearchEngine/internals/linguisticModule"
 	"sort"
 	"strings"
 )
@@ -14,9 +13,9 @@ func CreateLinearSortedEngineWithPosting(capacity int) *EngineV4 {
 	return &EngineV4{Data: make([]models.PostingList, 0, capacity)}
 }
 
-func (e *EngineV4) AddDoc(s *bufio.Scanner, id int) {
+func (e *EngineV4) AddDoc(s []string, id int, module linguisticModule.LinguisticModule) {
 	wordCount := make(map[string]int)
-	for _, word := range linguisticModule2.Scanner(s) {
+	for _, word := range module.Convert(s) {
 		wordCount[word]++
 	}
 

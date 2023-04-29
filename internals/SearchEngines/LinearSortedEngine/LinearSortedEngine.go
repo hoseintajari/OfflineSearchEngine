@@ -3,7 +3,6 @@ package LinearSortedEngine
 import (
 	"OfflineSearchEngine/internals/SearchEngines/models"
 	"OfflineSearchEngine/internals/linguisticModule"
-	"bufio"
 	"sort"
 	"strings"
 )
@@ -14,8 +13,8 @@ func CreateLinearSortedEngine(capacity int) *EngineV3 {
 	return &EngineV3{Data: make([]models.TermInfoWithFreq, 0, capacity)}
 }
 
-func (e EngineV3) AddDoc(s *bufio.Scanner, id int) {
-	stringSlice := linguisticModule.Scanner(s)
+func (e EngineV3) AddDoc(s []string, id int, module linguisticModule.LinguisticModule) {
+	stringSlice := module.Convert(s)
 	for _, v := range stringSlice {
 		e.Data = append(e.Data, models.TermInfoWithFreq{Term: v, DocId: id, Freq: GetFreq(v, stringSlice)})
 	}

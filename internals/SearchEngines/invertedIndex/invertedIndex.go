@@ -3,7 +3,6 @@ package invertedIndex
 import (
 	"OfflineSearchEngine/internals/SearchEngines/models"
 	"OfflineSearchEngine/internals/linguisticModule"
-	"bufio"
 )
 
 type InvertedIndex models.InvertedIndex
@@ -12,8 +11,8 @@ func CreateInvertedIndex(capacity int) *InvertedIndex {
 	return &InvertedIndex{Data: make(map[string][]models.SearchResult, capacity)}
 }
 
-func (i *InvertedIndex) AddDoc(s *bufio.Scanner, id int) {
-	for _, word := range linguisticModule.Scanner(s) {
+func (i *InvertedIndex) AddDoc(s []string, id int, module linguisticModule.LinguisticModule) {
+	for _, word := range module.Convert(s) {
 		_, ok := i.Data[word]
 		if !ok {
 			i.Data[word] = []models.SearchResult{{DocID: id, Freq: 1}}

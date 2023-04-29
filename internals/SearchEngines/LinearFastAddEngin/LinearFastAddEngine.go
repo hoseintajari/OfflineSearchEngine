@@ -3,7 +3,6 @@ package LinearFastAddEngin
 import (
 	"OfflineSearchEngine/internals/SearchEngines/models"
 	"OfflineSearchEngine/internals/linguisticModule"
-	"bufio"
 	"strings"
 )
 
@@ -13,8 +12,8 @@ func CreateLinearFastAddEngin(capacity int) *EngineV1 {
 	return &EngineV1{Data: make([]models.TermInfo, 0, capacity)}
 }
 
-func (e *EngineV1) AddDoc(s *bufio.Scanner, id int) {
-	for _, v := range linguisticModule.Scanner(s) {
+func (e *EngineV1) AddDoc(s []string, id int, module linguisticModule.LinguisticModule) {
+	for _, v := range module.Convert(s) {
 		e.Data = append(e.Data, models.TermInfo{Term: v, DocId: id})
 	}
 }
