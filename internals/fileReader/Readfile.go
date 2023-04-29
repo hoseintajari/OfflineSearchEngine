@@ -1,8 +1,8 @@
 package fileReader
 
 import (
-	"OfflineSearchEngine/internals/apiServer/CreateEngine"
-	"OfflineSearchEngine/internals/configuration"
+	"OfflineSearchEngine/internals/apiServer/server"
+	"OfflineSearchEngine/internals/linguisticModule"
 	"bufio"
 	"fmt"
 	"os"
@@ -36,17 +36,17 @@ func ReadFile(path string) (*bufio.Scanner, error) {
 	return scanner, err
 }
 
-func ListTextFiles(engine CreateEngine.SearchEngine, path string) error {
+func ListTextFiles(server *server.Server, li linguisticModule.LinguisticModule) error {
 	m := make(map[int]string)
-	filesPath := ReadDir(path)
+	filesPath := ReadDir(server.Engine.PathReadDir)
 	for _, v := range filesPath {
 		file, err := ReadFile(v)
 		if err != nil {
 			return err
 		}
-		configuration.DocId++
-		m[configuration.DocId] = v
-		engine.AddDoc(file, configuration.DocId)
+		server.Engine.DocId++
+		m[server.Engine.DocId] = v
+		server.Engine.Engine.AddDoc(bufConvertString(file), server.Engine.DocId, li)
 	}
 	return nil
 }
