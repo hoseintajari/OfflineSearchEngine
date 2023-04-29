@@ -1,15 +1,13 @@
 package main
 
 import (
+	"OfflineSearchEngine/internals/apiServer"
 	"OfflineSearchEngine/internals/apiServer/CreateEngine"
-	"OfflineSearchEngine/internals/apiServer/server"
-	"OfflineSearchEngine/internals/configuration"
 	"OfflineSearchEngine/internals/dataBase/DBmodels"
 )
 
 func main() {
 	DBmodels.CreateUserTable()
-	str := "v1"
-	configuration.MainEngine = CreateEngine.NewSearchEngine(str, 1000)
-	server.RunServer(configuration.MainEngine, "./Cmd")
+	engine := CreateEngine.NewSearchEngine("v1", 100)
+	apiServer.RunServer(engine, "./Cmd")
 }
