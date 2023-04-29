@@ -7,11 +7,11 @@ import (
 	"OfflineSearchEngine/internals/SearchEngines/LinearSortedEngineWithPosting"
 	"OfflineSearchEngine/internals/SearchEngines/invertedIndex"
 	"OfflineSearchEngine/internals/SearchEngines/models"
-	"bufio"
+	"OfflineSearchEngine/internals/linguisticModule"
 )
 
 type SearchEngine interface {
-	AddDoc(s *bufio.Scanner, id int)
+	AddDoc(s []string, id int, module linguisticModule.LinguisticModule)
 	Search(s string) ([]models.SearchResult, bool)
 }
 
