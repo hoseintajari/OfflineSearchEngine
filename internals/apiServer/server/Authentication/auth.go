@@ -1,4 +1,4 @@
-package routing
+package Authentication
 
 import (
 	"github.com/gin-gonic/gin"
@@ -35,7 +35,7 @@ func CreateJwt(username string, role bool) (string, error) {
 	return t, nil
 }
 
-func authMiddleware(requiredRole bool) gin.HandlerFunc {
+func AuthMiddleware(requiredRole bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
