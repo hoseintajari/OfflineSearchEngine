@@ -1,7 +1,7 @@
 package DBmodels
 
 import (
-	"OfflineSearchEngine/internals/apiServer/routing/requestResponsemodels"
+	"OfflineSearchEngine/internals/apiServer/server/requestResponsemodels"
 	"OfflineSearchEngine/internals/dataBase"
 	"OfflineSearchEngine/internals/utility"
 	"gorm.io/gorm"
