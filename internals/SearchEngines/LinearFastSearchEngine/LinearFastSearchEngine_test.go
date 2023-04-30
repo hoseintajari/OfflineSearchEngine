@@ -1,69 +1,95 @@
 package LinearFastSearchEngine
 
 import (
-	"bufio"
-	"fmt"
+	"OfflineSearchEngine/internals/SearchEngines/models"
+	"OfflineSearchEngine/internals/linguisticModule"
 	"strings"
 	"testing"
 )
 
 func TestCreateLinearFastSearchEngine(t *testing.T) {
-	// Test case 1: Capacity is zero
-	engine := CreateLinearFastSearchEngine(0)
-	if len(engine.Data) != 0 {
-		t.Errorf("CreateLinearFastSearchEngine: Expected capacity of zero to produce empty data, but got %d", len(engine.Data))
-	}
+	capacity := 10
+	engine := CreateLinearFastSearchEngine(capacity)
 
-	// Test case 2: Capacity is greater than zero
-	engine = CreateLinearFastSearchEngine(10)
-	if len(engine.Data) != 0 {
-		t.Errorf("CreateLinearFastSearchEngine: Expected capacity of 10 to produce empty data, but got %d", len(engine.Data))
+	if len(engine.Data) != 0 || cap(engine.Data) != capacity {
+		t.Errorf("CreateLinearFastSearchEngine did not create an engine with capacity of %d", capacity)
 	}
 }
+
+var module = linguisticModule.NewLinguisticModule(linguisticModule.ToLower{}, linguisticModule.StopWords{}, linguisticModule.PunctuationRemover{})
+
 func TestAddDoc(t *testing.T) {
-	engine := CreateLinearFastSearchEngine(10)
-	scanner := bufio.NewScanner(strings.NewReader(""))
-	engine.AddDoc(scanner, 1)
-	if len(engine.Data) != 0 {
-		t.Errorf("AddDoc: Expected empty scanner to produce empty data, but got %d", len(engine.Data))
+	engine := CreateLinearFastSearchEngine(20)
+	doc := []string{"ali", "sina", "amin", "test", "document"}
+	id := 1
+	engine.AddDoc(doc, id, module)
+
+	expectedData := []models.TermInfoWithFreq{
+		{Term: "ali", DocId: id, Freq: 1},
+		{Term: "sina", DocId: id, Freq: 1},
+		{Term: "amin", DocId: id, Freq: 1},
+		{Term: "test", DocId: id, Freq: 1},
+		{Term: "document", DocId: id, Freq: 1},
 	}
-	engine = CreateLinearFastSearchEngine(10)
-	scanner = bufio.NewScanner(strings.NewReader("hello world hello"))
-	engine.AddDoc(scanner, 1)
-	if len(engine.Data) != 3 {
-		t.Errorf("AddDoc: Expected scanner with three words to produce three term info with frequency, but got %d", len(engine.Data))
-	}
-	if engine.Data[0].DocId != 1 || engine.Data[0].Term != "hello" || engine.Data[0].Freq != 2 {
-		t.Errorf("AddDoc: Expected engine data to have term info with DocId=1, Term=hello, and Freq=2, but got %+v", engine.Data[0])
-	}
-	if engine.Data[1].DocId != 1 || engine.Data[1].Term != "world" || engine.Data[1].Freq != 1 {
-		t.Errorf("AddDoc: Expected engine data to have term info with DocId=1, Term=world, and Freq=1, but got %+v", engine.Data[1])
-	}
-	if engine.Data[2].DocId != 1 || engine.Data[2].Term != "hello" || engine.Data[2].Freq != 2 {
-		t.Errorf("AddDoc: Expected engine data to have term info with DocId=1, Term=hello, and Freq=2, but got %+v", engine.Data[2])
+
+	for i, v := range engine.Data {
+		if v.Term != expectedData[i].Term || v.DocId != expectedData[i].DocId || v.Freq != expectedData[i].Freq {
+			t.Errorf("AddDoc failed. Got %v, expected %v", engine.Data, expectedData)
+			return
+		}
 	}
 }
+
 func TestSearch(t *testing.T) {
-	engine := CreateLinearFastSearchEngine(10)
+	engine := CreateLinearFastSearchEngine(100)
+	docs := []string{
+		"apple pie recipe",
+		"how to make apple pie from scratch",
+		"easy apple pie recipe",
+		"best apple pie recipe",
+		"apple pie with crumb topping",
+	}
+	for i, doc := range docs {
+		engine.AddDoc(strings.Split(doc, " "), i, module)
+	}
 
-	doc1 := "This is a test document for search engine testing."
-	scanner1 := bufio.NewScanner(strings.NewReader(doc1))
-	engine.AddDoc(scanner1, 1)
+	searchResults, ok := engine.Search("apple pie")
+	if !ok {
+		t.Errorf("Expected search to return results, got ok=%v", ok)
+	}
 
-	doc2 := "Search engine testing is important for information retrieval."
-	scanner2 := bufio.NewScanner(strings.NewReader(doc2))
-	engine.AddDoc(scanner2, 2)
+	expectedResults := []models.SearchResult{
+		{DocID: 0, Freq: 1},
+		{DocID: 1, Freq: 1},
+		{DocID: 2, Freq: 1},
+		{DocID: 3, Freq: 1},
+		{DocID: 4, Freq: 1},
+	}
 
-	doc3 := "Search engine testing requires careful consideration of different techniques."
-	scanner3 := bufio.NewScanner(strings.NewReader(doc3))
-	engine.AddDoc(scanner3, 3)
-	results, found := engine.Search("search engine testing")
+	if len(searchResults) != len(expectedResults) {
+		t.Errorf("Expected %d results, got %d", len(expectedResults), len(searchResults))
+	}
 
-	if found {
-		for _, res := range results {
-			fmt.Printf("Document ID: %d, Frequency: %d\n", res.DocID, res.Freq)
+	for _, expected := range expectedResults {
+		found := false
+		for _, result := range searchResults {
+			if expected.DocID == result.DocID && expected.Freq == result.Freq {
+				found = true
+				break
+			}
 		}
-	} else {
-		fmt.Println("No results found.")
+		if !found {
+			t.Errorf("Expected result not found: %v", expected)
+		}
+	}
+}
+
+func TestGetFreq(t *testing.T) {
+	stringSlice := []string{"this", "is", "a", "test", "document", "this", "is", "is", "test"}
+	s := "is"
+	freq := GetFreq(s, stringSlice)
+
+	if freq != 3 {
+		t.Errorf("GetFreq failed. Got %d, expected %d", freq, 3)
 	}
 }

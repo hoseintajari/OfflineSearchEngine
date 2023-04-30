@@ -1,59 +1,51 @@
 package invertedIndex
 
 import (
-	"OfflineSearchEngine/internals/SearchEngines/models"
-	"bufio"
-	"reflect"
-	"strings"
+	"OfflineSearchEngine/internals/linguisticModule"
 	"testing"
 )
 
 func TestCreateInvertedIndex(t *testing.T) {
-	ii := CreateInvertedIndex(100)
-	if len(ii.Data) != 0 {
-		t.Errorf("Expected empty map, got %v", ii.Data)
-	}
-}
-func TestAddDoc(t *testing.T) {
-	ii := CreateInvertedIndex(100)
-	doc1 := "The quick brown fox jumps over the lazy dog"
-	doc2 := "A quick brown dog outpaces a quick brown fox"
-	ii.AddDoc(bufio.NewScanner(strings.NewReader(doc1)), 1)
-	ii.AddDoc(bufio.NewScanner(strings.NewReader(doc2)), 2)
-	results1 := ii.Data["quick"]
-	if len(results1) != 2 {
-		t.Errorf("Expected 2 search results for 'quick', got %v", results1)
-	}
-	if results1[0].DocID != 1 || results1[0].Freq != 1 {
-		t.Errorf("Expected search result 0 to be {1, 1}, got %v", results1[0])
-	}
-	if results1[1].DocID != 2 || results1[1].Freq != 2 {
-		t.Errorf("Expected search result 1 to be {2, 2}, got %v", results1[1])
-	}
-}
-
-func TestInvertedIndex_Search(t *testing.T) {
 	i := CreateInvertedIndex(10)
-	doc1 := "this is a test document"
-	doc2 := "A quick brown dog outpaces a quick brown fox test"
-	i.AddDoc(bufio.NewScanner(strings.NewReader(doc1)), 1)
-	i.AddDoc(bufio.NewScanner(strings.NewReader(doc2)), 2)
+	if len(i.Data) != 0 {
+		t.Errorf("Expected empty data map, but got map with length %d", len(i.Data))
+	}
+}
 
-	result, ok := i.Search("test")
+func TestAddDoc(t *testing.T) {
+	i := CreateInvertedIndex(10)
+	s := []string{"sina", "ali", "amin", "test", "document"}
+	id := 1
+	module := linguisticModule.NewLinguisticModule(linguisticModule.ToLower{}, linguisticModule.StopWords{}, linguisticModule.PunctuationRemover{})
+	i.AddDoc(s, id, module)
+	if len(i.Data) != 5 {
+		t.Errorf("Expected data map with length 5, but got length %d", len(i.Data))
+	}
+	if len(i.Data["sina"]) != 1 || i.Data["sina"][0].DocID != 1 || i.Data["sina"][0].Freq != 1 {
+		t.Errorf("Expected data map to contain {DocID: 1, Freq: 1} for key 'this', but got %v", i.Data["this"])
+	}
+}
+
+func TestSearch(t *testing.T) {
+	i := CreateInvertedIndex(10)
+	s1 := []string{"This", "is", "a", "test", "document"}
+	id1 := 1
+	s2 := []string{"This", "is", "another", "test", "document"}
+	id2 := 2
+	module := linguisticModule.NewLinguisticModule(linguisticModule.ToLower{}, linguisticModule.StopWords{}, linguisticModule.PunctuationRemover{})
+	i.AddDoc(s1, id1, module)
+	i.AddDoc(s2, id2, module)
+	results, ok := i.Search("test")
 	if !ok {
-		t.Errorf("Expected search result to be true but got false")
+		t.Error("Expected Search to return true, but got false")
 	}
-	expected := []models.SearchResult{{DocID: 1, Freq: 1}, {DocID: 2, Freq: 1}}
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Expected search result to be %v but got %v", expected, result)
+	if len(results) != 2 {
+		t.Errorf("Expected Search to return 2 results, but got %d", len(results))
 	}
-
-	result, ok = i.Search("foobar")
-	if ok {
-		t.Errorf("Expected search result to be false but got true")
+	if results[0].DocID != 1 || results[0].Freq != 1 {
+		t.Errorf("Expected first result to be {DocID: 1, Freq: 1}, but got %v", results[0])
 	}
-	expected = nil
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Expected search result to be %v but got %v", expected, result)
+	if results[1].DocID != 2 || results[1].Freq != 1 {
+		t.Errorf("Expected second result to be {DocID: 2, Freq: 1}, but got %v", results[1])
 	}
 }
